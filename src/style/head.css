@@ -1,0 +1,23 @@
+.header {
+    display: flex;
+    flex-direction: column;
+    /* align-items: center; */
+  }
+  
+  .van-nav-bar{
+    background-color: #4296ED;
+    --van-nav-bar-title-text-color: #fff;
+    --van-nav-bar-text-color: #fff;
+    --van-nav-bar-icon-color: #fff; /* 设置左箭头颜色为白色 */
+  }
+  
+  .header-background {
+    width: 375px;
+    height: 180px;
+    background-color: #4296ED;
+  }
+  
+  .header-image {
+    width: 100%;
+    height: auto;
+  }
