@@ -1,10 +1,11 @@
 <template>
   <van-nav-bar
-    title="标题"
+    title="上海创临"
     class="custom-nav-bar"
     left-text="返回"
     left-arrow
     @click-left="onClickLeft"
+    @click-right="onClickRight"
   >
   <template #right>
     <van-icon name="search" size="18" />

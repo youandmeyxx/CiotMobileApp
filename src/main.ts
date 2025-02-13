@@ -6,7 +6,7 @@ import { createApp } from 'vue';
 // 引入pinia
 import { createPinia } from 'pinia';
 // 引入vant
-import { NavBar, ConfigProvider,Icon, Tabbar, TabbarItem } from 'vant';
+import Vant from 'vant';
 // 引入App.vue
 import App from './App.vue';
 // 引入router
@@ -19,10 +19,6 @@ app.use(createPinia())
 // 使用router
 app.use(router)
 // 使用vant
-app.use(Tabbar);
-app.use(TabbarItem);
-app.use(NavBar);
-app.use(Icon);
-app.use(ConfigProvider);
+app.use(Vant);
 // 挂载app
 app.mount('#app')
