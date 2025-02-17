@@ -24,7 +24,7 @@
     const handleClick = (index: number) => {
         console.log(`Grid item ${index} clicked`);
         // 在这里添加你的点击处理逻辑
-        router.push('/myjobs')
+        router.push(iconPath[index].routerPath)
     };
 </script>
 <style scoped>

@@ -1,6 +1,6 @@
 <template>
     <van-tabbar v-model="active">
-    <van-tabbar-item name="home" icon="home-o">标签</van-tabbar-item>
+    <van-tabbar-item name="home" icon="home-o">首页</van-tabbar-item>
     <van-tabbar-item name="apps" icon="apps-o">应用</van-tabbar-item>
     <van-tabbar-item name="message" icon="comment-o" :badge="messageBadge">消息</van-tabbar-item>
     <van-tabbar-item name="manager" icon="manager-o">我的</van-tabbar-item>

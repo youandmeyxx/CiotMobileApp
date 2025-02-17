@@ -7,6 +7,7 @@ import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 // 引入vant
 import Vant from 'vant';
+import { ActionBar, ActionBarIcon, ActionBarButton } from 'vant';
 // 引入App.vue
 import App from './App.vue';
 // 引入router

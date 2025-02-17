@@ -11,10 +11,27 @@ const router = createRouter({
     {
       path: '/myjobs',
       name: 'myjobs',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
       component: () => import('@/views/components/myJob/myJob.vue'),
+    },
+    {
+      path: '/assignjob',
+      name: 'assignjob',
+      component: () => import('@/views/components/assignJob/assignJob.vue'),
+    },
+    {
+      path: '/joblist',
+      name: 'joblist',
+      component: () => import('@/views/components/jobList/jobList.vue'),
+    },
+    {
+      path: '/jobrecord',
+      name: 'jobrecord',
+      component: () => import('@/views/components/jobRecord/jobRecord.vue'),
+    },
+    {
+      path: '/jobverify',
+      name: 'jobverify',
+      component: () => import('@/views/components/jobVerify/jobVerify.vue'),
     },
   ],
 })
