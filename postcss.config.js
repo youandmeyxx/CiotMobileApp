@@ -7,7 +7,7 @@ module.exports = {
             propList: ['*'], // 需要转换的属性列表，* 表示所有属性
             viewportUnit: 'vw', // 转换后的视口单位
             fontViewportUnit: 'vw', // 字体使用的视口单位
-            selectorBlackList: [], // 不需要转换的选择器列表
+            selectorBlackList: [/^.desktop-page/], // 不需要转换的选择器列表
             minPixelValue: 1, // 最小的转换像素值，小于该值不转换
             mediaQuery: false, // 是否在媒体查询中进行转换
             replace: true, // 是否直接替换原有的属性值

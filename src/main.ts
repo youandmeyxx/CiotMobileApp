@@ -7,12 +7,15 @@ import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 // 引入vant
 import Vant from 'vant';
-import { ActionBar, ActionBarIcon, ActionBarButton } from 'vant';
 // 引入App.vue
 import App from './App.vue';
 // 引入router
 import router from './router';
 import "amfe-flexible";
+import Antd from 'ant-design-vue';
+import Vue3Esign from 'vue3-esign';
+
+
 // 创建app
 const app = createApp(App)
 // 使用pinia
@@ -21,5 +24,8 @@ app.use(createPinia())
 app.use(router)
 // 使用vant
 app.use(Vant);
+// 使用antd
+app.use(Antd);
+app.use(Vue3Esign);
 // 挂载app
 app.mount('#app')

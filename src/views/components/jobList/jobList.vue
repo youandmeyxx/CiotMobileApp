@@ -1,84 +1,122 @@
 <template>
+  <div style="padding-bottom:100px;">
   <div class="custom-div-title">装维任务列表</div>
   <div>
     <van-search
-      v-model="value"
-      show-action
+      v-model="ctradername"
       label="客户名:"
       placeholder="请输入搜索关键词"
-      @search="onSearch"
     >
-      <template #action>
-        <van-button type="primary"  size="mini" class="custom-button" @click="onClickButton">搜  索</van-button>
-      </template>
+  </van-search>
+    <van-search
+      v-model="operator"
+      label="装维人员:"
+      placeholder="请输入搜索关键词"
+    >
     </van-search>
+    <div class="button-container">
+      <van-button
+        plain
+        icon="search"
+        type="primary"
+        @click="onClickButton"
+      >
+        搜索
+      </van-button>
+    </div>
   </div>
   <div>
     <van-collapse v-model="activeName" accordion>
-      <van-collapse-item v-for="(item, index) in jobData" :key="index" :title="item.cusName" :name="index">
-        <ul>
-          <li>地址:{{ item.addr }}</li>
-          <li>装维人员:{{ item.operator }}</li>
-          <li>联系人:{{ item.contact }}</li>
-          <li>联系电话:{{ item.tel }}</li>
-        </ul>
-        <div class="button-container">
-          <van-button type="primary" size="small">登  记</van-button>
+      <van-collapse-item v-for="(item, index) in jobData" :key="index" :title="item.ctradername" :name="index">
+        <div>
+          <ul>
+            <li>任务类型:{{ item.assigntype }}</li>
+          </ul>
+          详情:
+          <van-text-ellipsis
+          rows="3"
+          :content="item.billto"
+          expand-text="展开"
+          collapse-text="收起"
+          />
+          <ul>
+            <li>客户铺名:{{ item.ctradername }}</li>
+          </ul>
         </div>
+          <ul>
+            <li>销售单号:{{ item.billcode }}</li>
+            <li>销售时间:{{ item.billdate }}</li>
+            <li>装维人员:{{ item.operator }}</li>
+            <li>安装时间:{{ item.jobdate }}</li>
+            <li>销售员:{{ item.empname }}</li>
+            <li>超密:{{ item.userdef1 }}</li>
+          </ul>
+          <van-button type="primary" size="small" @click="getBillIdByBillcode(item.billcode)">出货列表</van-button>
       </van-collapse-item>
     </van-collapse> 
   </div>
+</div>
 </template>
 <script setup lang="ts" home="JobList">
   import { ref } from 'vue';
   import { showToast } from 'vant';
   import '@/style/custom.css';
-  const value = ref('');
-  const activeName = ref('1');
-  const onSearch = (val:string) => showToast(val);
-  const onClickButton = () => showToast(value.value);
-  
-  const tel = ref('');
-  const addr = ref('');
-  const contact = ref('');
+  import type { setuprecord, CalendarValue,Option,SaleBill} from '@/views/components/support/interface.ts';
+import axios from 'axios';
+import { DOMAIN_RUL } from '@/plugins/globalVariables';
+import router from '@/router';
   const operator = ref('');
-  const cusName = ref('穿堂风');
+  const ctradername =ref(''); 
+  const activeName = ref('1');
+  const billid = ref('');
+      //装维单数据
+  const jobData = ref<SaleBill[]>([]);
+  
+  const onSearch = () =>{
 
-  interface FormValues {
-        tel: string;
-        addr: string;
-        contact: string;
-        operator: string;
-        cusName: string;
+  };
+  const onClickButton = () =>{
+    axios.get(`${DOMAIN_RUL}/workWeChart/jobList`,{
+      params: {
+        operator: operator.value,
+        tradername: ctradername.value
+      }
+    })
+    .then(response => {
+                if (response.data.code === 200) {
+                  console.log(response.data.result);
+                    jobData.value = response.data.result;
+                    
+                }
+            })
+    .catch(error => {
+            console.error('请求失败', error);
+            // 在这里处理错误
+            });
+  }; 
+
+  function getBillIdByBillcode(billcode: string) {
+      axios.get(`${DOMAIN_RUL}/workWeChart/getBillIdByBillcode`,{
+        params: {
+          billcode: billcode
+        }
+      }).then(response => {
+        if (response.data.code === 200) {
+          console.log("getBillIdByBillcode:",response.data.result);
+          billid.value = response.data.result;
+          console.log("billid:",billid.value);
+          router.push({
+          name: 'jobDetail',
+          query: { billid: billid.value } // 假设 item.billid 是你要传递的参数
+          });        
+        }
+      }).catch(error => {
+            console.error('请求失败', error);
+            // 在这里处理错误
+      });
+      return billid.value;
     }
 
-        //装维单数据
-      const jobData = [
-      {
-        id: 1,
-        cusName: '穿堂风',
-        addr: '北京市海淀区',
-        contact: '张三',
-        tel: '13888888888',
-        operator: '小张',
-      }, 
-      {
-        id: 2,
-        cusName: '杨国福',
-        addr: '上海市嘉定区',
-        contact: '李四',
-        tel: '13888888888',
-        operator: '小李',
-      }, 
-      {
-        id: 2,
-        cusName: '吴老幺',
-        addr: '上海市嘉定区',
-        contact: '李四',
-        tel: '13888888888',
-        operator: '小李',
-      },
-    ];
 </script>
 <style scoped>
 .button-container {

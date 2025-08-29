@@ -1,4 +1,5 @@
 <template>
+  <div style="margin: 0 auto">
   <van-nav-bar
     title="上海创临"
     class="custom-nav-bar"
@@ -11,7 +12,10 @@
     <van-icon name="search" size="18" />
   </template>
   </van-nav-bar>
+  
   <img src="../assets/head.png" alt="Header Image" class="header-image" />
+  </div>
+
 </template>
 
 <script setup lang="ts" name="AppHead">

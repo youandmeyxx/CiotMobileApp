@@ -1,0 +1,57 @@
+<template>
+    <div>
+      <van-nav-bar title="销售详情列表" left-arrow @click-left="$router.back()" />
+      <van-list
+        v-model:loading="loading"
+        :finished="finished"
+        finished-text="没有更多了"
+        @load="onLoad"
+      >
+        <van-cell
+          v-for="(item, index) in saleBillDetails"
+          :key="index"
+          :title="item.goodsname"
+          :label="`规格: ${item.specs}, 单位: ${item.unitname}, 数量: ${item.unitquantity}, 单价: ${item.unitprice},设备编号:${item.userdef7} ${item.userdef8} `"
+        />
+      </van-list>
+    </div>
+  </template>
+  
+  <script lang="ts" setup>
+    import { ref, onMounted } from 'vue';
+    import type { SaleBillDetail } from '@/views/components/support/interface.ts';
+    import { useRoute } from 'vue-router';
+    import { DOMAIN_RUL } from '@/plugins/globalVariables';
+    import axios from 'axios';
+    const route = useRoute();
+    const billid = route.query.billid; 
+    const saleBillDetails = ref<SaleBillDetail[]>([]);
+    const loading = ref(false);
+    const finished = ref(false);
+  
+    const onLoad = () => {
+        const billid = route.query.billid; 
+        console.log('billid:',billid);
+    //get请求读取 saleBillDetails 数据
+      axios.get(`${DOMAIN_RUL}/workWeChart/jobDetail`,{
+      params:{
+        billid: billid,
+      }
+    }).then((response) => {
+        console.log(response.data.result);
+        saleBillDetails.value = response.data.result.detail1; // 假设返回的数据结构是 { data: { saleBillDetails: SaleBillDetail[] } };
+        loading.value = false; // 加载完成
+        finished.value = true;
+    }).catch((error) => {
+      console.log('Error:', error);
+    });
+    };
+  
+  onMounted(() => {
+    onLoad();
+  });
+  </script>
+  
+  <style scoped>
+  /* 可以在这里添加自定义样式 */
+  </style>

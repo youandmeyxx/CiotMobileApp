@@ -5,11 +5,13 @@
         <van-grid-item 
             v-for="(value, index) in iPath.length" 
             :key="value" 
-            :icon="iPath[index % iconPath.length].iconPath"
             :text="iPath[index % iconPath.length].title" 
-            class="custom-icon"
             @click="handleClick(index)"
-        />
+        >      
+            <template #icon>
+                <img :src="iPath[index % iconPath.length].iconPath" style="width: 60px; height: 60px;">
+            </template>
+        </van-grid-item>
     </van-grid>
   </div>
 </template>

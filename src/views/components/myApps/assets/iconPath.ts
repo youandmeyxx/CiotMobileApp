@@ -1,7 +1,10 @@
+import { globalPath } from "@/plugins/globalVariables";
 export const iconPath = [
-    {title:'我的任务',iconPath:'src/views/components/myApps/assets/img/myJob.png', routerPath: '/myjobs'},
-    {title:'任务分配',iconPath:'src/views/components/myApps/assets/img/assignJob.png', routerPath: '/assignJob'},
-    {title:'装维登记',iconPath:'src/views/components/myApps/assets/img/record.png', routerPath: '/jobrecord'},
-    {title:'装维查询',iconPath:'src/views/components/myApps/assets/img/search.png', routerPath: '/joblist'},
-    {title:'装维审核',iconPath:'src/views/components/myApps/assets/img/verify.png', routerPath: '/jobverify'},
+    {title:'我的任务',iconPath: globalPath +  '/assets/myJob.png', routerPath: '/myjobs'},
+    {title:'任务分配',iconPath: globalPath + '/assets/assignJob.png', routerPath: '/assignJob'},
+    {title:'登记查询',iconPath: globalPath +'/assets/record.png', routerPath: '/jobRecordList'},
+    {title:'登记报表',iconPath: globalPath +'/assets/record.png', routerPath: '/jobReport'},
+    {title:'装维查询',iconPath: globalPath +'/assets/search.png', routerPath: '/joblist'},
+    {title:'装维审核',iconPath: globalPath + '/assets/verify.png', routerPath: '/jobverify'},
+    {title:'人员管理',iconPath: globalPath + '/assets/record.png', routerPath: '/operatorList'},
     ];
