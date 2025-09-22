@@ -7,4 +7,7 @@ export const iconPath = [
     {title:'装维查询',iconPath: globalPath +'/assets/search.png', routerPath: '/joblist'},
     {title:'装维审核',iconPath: globalPath + '/assets/verify.png', routerPath: '/jobverify'},
     {title:'人员管理',iconPath: globalPath + '/assets/record.png', routerPath: '/operatorList'},
+    {title:'合同登记',iconPath: globalPath + '/assets/record.png', routerPath: '/contractUpload'},
+    {title:'合同查询',iconPath: globalPath + '/assets/record.png', routerPath: '/contractList'},
+
     ];

@@ -1,15 +1,15 @@
-  <!-- pdf展示
+ <!-- pdf展示 -->
 <template>
 
-      <div class="leftMain">
+      <div>
         <PdfView :pdf="jspdf" style="width: 100%;height:100%;"></PdfView>
-        </div>
+      </div>
 </template> 
  
 <script lang="ts" setup>
     import PdfView from './testPdf.vue';
     import jspdf from './test.pdf';
-</script> -->
+</script>
 
 <!-- <template>
   <div>
@@ -29,18 +29,18 @@ import WordEditor from './WordEditor.vue';
 </script> -->
 
 
-<template>
+<!-- <template>
   <main>
-    <Signature v-model:signature-pic="signaturePic" />
+    <Signature />
   </main>
 </template>
 
 <script lang="ts" setup>
 import { ref } from "vue";
-import Signature from "./testpic.vue";
+import Signature from "./DocxWithPositionedSignature.vue";
 
 const signaturePic = ref<string>("");
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped></style> -->
 

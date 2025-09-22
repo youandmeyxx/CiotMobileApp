@@ -1,7 +1,7 @@
 <template>
   <div>
     <van-field v-model="iccid" label="ICCID 号" placeholder="请输入 ICCID 号" />
-    <van-button @click="fetchCardInfo">查询</van-button>
+    <van-button @click="test()">查询</van-button>
     <div v-if="cardStatuInfo">
       <p>ICCID 号: {{ cardInfoMeta.iccidCode }}</p>
       <p>MSISDN 号: {{ cardInfoMeta.accessCode }}</p>
@@ -47,19 +47,19 @@ const cardInfoMeta = ref<CardInfoMeta>({} as CardInfoMeta);
 const tp = ref<CardStatuInfo>({} as CardStatuInfo);
 
 
-// const test = () => {
-//    axios.get(`${DOMAIN_RUL}/api/cm/test`,{
-//       params:{
-//          iccid: iccid.value, 
-//       }
-//     }).then((response) => {
-//         console.log(response.data.result);
+const test = () => {
+   axios.get(`${DOMAIN_RUL}/api/cm/test`,{
+      params:{
+         iccid: iccid.value, 
+      }
+    }).then((response) => {
+        console.log(response.data.result);
 
-//         cardStatuInfo.value.cardStatus = response.data.result; // 假设返回的数据结构是 { data: { cardStatuInfo: CardStatuInfo } };
-//     }).catch((error) => {
-//       console.log('Error:', error);
-//     }); 
-// }
+        cardStatuInfo.value.cardStatus = response.data.result; // 假设返回的数据结构是 { data: { cardStatuInfo: CardStatuInfo } };
+    }).catch((error) => {
+      console.log('Error:', error);
+    }); 
+}
 
 
 

@@ -26,7 +26,18 @@
                     />
                     <div>销售员:<van-text-ellipsis :content="saleBillData.empname" /></div>
                     <div>超密:<van-text-ellipsis 
-                        :content="saleBillData.userdef1"
+                        :content="'品牌名称:' +(saleBillData.userdef1===null?'':saleBillData.userdef1) + 
+                            '安装时间:' +(saleBillData.userdef2===null?'':saleBillData.userdef2) + 
+                            '沉默期:' +(saleBillData.userdef3===null?'':saleBillData.userdef3) +
+                            '设备sn号1:' +(saleBillData.userdef4===null?'':saleBillData.userdef4) +
+                            '设备sn号2:' +(saleBillData.userdef5===null?'':saleBillData.userdef5) +
+                            '套餐编号:' +(saleBillData.userdef6===null?'':saleBillData.userdef6) +
+                            '路由器:' +(saleBillData.userdef7===null?'':saleBillData.userdef7) +
+                            '卡号1:' +(saleBillData.userdef8===null?'':saleBillData.userdef8) +
+                            '卡号2:' +(saleBillData.userdef9===null?'':saleBillData.userdef9) +
+                            '其他:' +(saleBillData.userdef10===null?'':saleBillData.userdef10) +
+                            '卡号3:' +(saleBillData.userdef11===null?'':saleBillData.userdef11) +
+                            '卡号4:' +(saleBillData.userdef12===null?'':saleBillData.userdef12)"
                         rows="3"
                         expand-text="展开"
                         collapse-text="收起"
@@ -35,9 +46,9 @@
             </van-collapse-item>
         </van-collapse> 
         <van-form @submit="onRecordSubmit">
-            <van-field v-model="addr" label="地址:" />
+            <van-field v-if="saleBillData.assigntype === '新装'" v-model="addr" label="地址:" />
             <van-field v-model="topology" label="网络拓扑:" />
-            <van-field
+            <van-field v-if="saleBillData.assigntype === '新装'"
                 v-model="carrier"
                 is-link
                 readonly
@@ -46,7 +57,7 @@
                 placeholder="请选择运营商"
                 @click="showPickerOperator = true"
             />
-            <van-field
+            <van-field v-if="saleBillData.assigntype === '新装'"
                 v-model="realnametype"
                 is-link
                 readonly
@@ -55,7 +66,7 @@
                 placeholder="请选择运营商"
                 @click="showPickerRealNameType = true"
             />
-            <van-field
+            <van-field v-if="saleBillData.assigntype === '新装'"
                 v-model="routertype"
                 is-link
                 readonly
@@ -65,8 +76,8 @@
                 @click="showPickerRouterType = true"
             />
             <van-field v-if="routertype==='另安装'" v-model="routername" label="路由器型号:" />
-            <van-cell title="安装后应用:" />
-            <van-checkbox-group v-model="aftersetup" direction="horizontal">
+            <van-cell v-if="saleBillData.assigntype === '新装'" title="安装后应用:" />
+            <van-checkbox-group v-if="saleBillData.assigntype === '新装'" v-model="aftersetup" direction="horizontal">
                 <van-checkbox name="收银机">收银机</van-checkbox>
                 <van-checkbox name="外卖打印机">外卖打印机</van-checkbox>
                 <van-checkbox name="摄像头">摄像头</van-checkbox>
@@ -80,7 +91,7 @@
                     ></van-uploader>
                 </template>
             </van-field>
-            <van-field name="uploader" label="微信截图:">
+            <van-field v-if="saleBillData.assigntype === '新装'" name="uploader" label="微信截图:">
                 <template #input>
                     <van-uploader v-model="wxPicUrl"
                         :multiple="true"
@@ -88,6 +99,7 @@
                     ></van-uploader>
                 </template>
             </van-field>
+            <van-field  v-model="remark" label="备注:" />
             <div style="margin: 16px; padding-bottom:100px;">
                 <van-button round block type="primary" native-type="submit">
                     登记提交
@@ -141,9 +153,9 @@ import Compressor from 'compressorjs';
 const route = useRoute();
 const collapse = ref('1');
 // 定义需要创建 ref 的变量名数组
-const fieldNames = ['billcode','tel', 'addr', 'contact', 'carrier', 'realnametype', 'cusName', 'routertype', 'routername', 'setupdate', 'topology'];
+const fieldNames = ['billcode','tel', 'addr', 'contact', 'carrier', 'realnametype', 'cusName', 'routertype', 'routername', 'setupdate', 'topology','remark'];
 // 使用 Object.fromEntries 批量创建 ref 变量
-const { billcode, tel, addr, contact, carrier, realnametype, cusname, routertype, routername, setupdate, topology } = Object.fromEntries(fieldNames.map(name => [name, ref('')]));
+const { billcode, tel, addr, contact, carrier, realnametype, cusname, routertype, routername, setupdate, topology,remark } = Object.fromEntries(fieldNames.map(name => [name, ref('')]));
 const loading = ref(false);
 const jobid = ref(0);
 const operatorPickerValue = ref<string[]>([]);
@@ -180,7 +192,18 @@ const saleBillData = ref<SaleBill>({
     assigntype: '',
     jobid: 0,
     jobtime: '',
-    userdef1: ''
+    userdef1: '',
+    userdef2: '',
+    userdef3: '',
+    userdef4: '',
+    userdef5: '',
+    userdef6: '',
+    userdef7: '',
+    userdef8: '',
+    userdef9: '',
+    userdef10: '',
+    userdef11: '',
+    userdef12: ''
     });
   
 
@@ -242,7 +265,18 @@ const saleBillData = ref<SaleBill>({
             assigntype: '',
             jobid: 0,
             jobtime: '',
-            userdef1: ''
+            userdef1: '',
+            userdef2: '',
+            userdef3: '',
+            userdef4: '',
+            userdef5: '',
+            userdef6: '',
+            userdef7: '',
+            userdef8: '',
+            userdef9: '',
+            userdef10: '',
+            userdef11: '',
+            userdef12: ''
         };
     // 根据 billcode 作为参数，获取 job 信息
     loading.value = true;
@@ -275,49 +309,6 @@ const saleBillData = ref<SaleBill>({
             
         });
 
-    //         // 压缩并添加验收图片
-    //     const compressAndAppendPic = () => {
-    //             let count = 0;
-    //             picUrl.value.forEach(({ file }, index) => {
-    //                 new Compressor(file, {
-    //                     quality: 0.6, // 压缩质量，范围 0 - 1
-    //                     success(result: string | Blob) {
-    //                         console.error('图片压缩成功', result);
-    //                         formData.append('file', result);
-    //                         count++;
-    //                         if (count === picUrl.value.length) {
-    //                         }
-    //                     },
-    //                     error(err: any) {
-    //                         console.error('图片压缩失败', err);
-    //                     }
-    //                 });
-    //             });
-    //             if (picUrl.value.length === 0) {
-    //             }
-    //     };
-
-    // // 压缩并添加微信截图
-    // const compressAndAppendWxPic = () => {
-    //         let count = 0;
-    //         wxPicUrl.value.forEach(({ file }, index) => {
-    //             new Compressor(file, {
-    //                 quality: 0.6, // 压缩质量，范围 0 - 1
-    //                 success(result: string | Blob) {
-    //                     console.error('图片压缩成功', result);
-    //                     formDataWx.append('file', result);
-    //                     count++;
-    //                     if (count === wxPicUrl.value.length) {
-    //                     }
-    //                 },
-    //                 error(err: any) {
-    //                     console.error('图片压缩失败', err);
-    //                 }
-    //             });
-    //         });
-    //         if (wxPicUrl.value.length === 0) {
-    //         }
-    // };
 
         let nonce = generateNonce();
         axios.post(`${DOMAIN_RUL}/workWeChart/recordWxUpload`, formDataWx, {
@@ -356,7 +347,7 @@ const saleBillData = ref<SaleBill>({
             })
         .catch(error => {
             console.error('请求失败', error);
-            if (picpath === '') {
+            if (picpath === '' && saleBillData.value.assigntype === '新装') {
                     showToast('验收图片出错，请上传安装验收图片');
                     loading.value = false;
                     return;
@@ -389,11 +380,12 @@ const saleBillData = ref<SaleBill>({
             jobid: jobid.value,
             assigntype: saleBillData.value.assigntype,
             verifytype: '完成',
+            remark: remark.value,
                 // 新增 nonce 参数，这里假设 nonce 是通过一个函数生成
             
         }
 
-        if(validateData(recordInfo)===false){
+        if(saleBillData.value.assigntype === '新装' && validateData(recordInfo)===false){
             loading.value = false;
             return;
         }

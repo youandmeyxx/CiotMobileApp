@@ -3,6 +3,17 @@
     <div class="custom-div-title">电签合同登记</div>
     <van-form @submit="onSubmit">
         <van-field v-model="billcode" label="开单编号:" />
+        <van-field v-model="ctradername" label="客户名称:" />
+
+        <van-field
+                v-model="contracttype"
+                is-link
+                readonly
+                name="contract"
+                label="合同类型:"
+                placeholder="选择类型"
+                @click="showType = true"
+        />
         <van-field name="uploader" label="上传合同:">
             <template #input>
                 <van-uploader
@@ -23,11 +34,21 @@
     <van-cell title="合同预览:" />
     <div ref="previewContainer"></div>
   </div>
+    <van-popup v-model:show="showType" position="bottom">
+                    <van-picker
+                        :columns="columns"
+                        :model-value="typePickerValue"
+                        @confirm="onConfirmType"
+                        @cancel="showType = false"
+                    />
+    </van-popup>
+
+
 </template>
 <script setup lang="ts">
 import '@/style/custom.css';
 import { ref } from 'vue';
-const fieldNames = ['billcode','tel', 'addr', 'contact', 'carrier', 'realnametype', 'cusName', 'routertype', 'routername', 'setupdate', 'topology'];
+const fieldNames = ['billcode','tel', 'addr', 'contact', 'carrier', 'realnametype', 'cusName', 'contracttype', 'routername', 'setupdate', 'topology'];
 // 使用 Object.fromEntries 批量创建 ref 变量
 const { billcode, tel, addr, contact, carrier, realnametype, cusname, routertype, routername, setupdate, topology } = Object.fromEntries(fieldNames.map(name => [name, ref('')]));
 // @ts-ignore
@@ -37,11 +58,19 @@ import { showToast } from 'vant';
 import axios from 'axios';
 import { generateNonce } from '../support/function';
 import { DOMAIN_RUL } from '@/plugins/globalVariables';
+import type { Option } from '@/views/components/support/interface.ts';
 import router from '@/router';
+import { columns } from "@/views/components/websign/columns";
 
 const contractUrl = ref([]);
+const contracttype = ref('');
+const showType = ref(false);
 const previewContainer = ref<HTMLDivElement | null>(null);
+const typePickerValue = ref<string[]>([]);
 const contractPath = ref('');
+const ctradername = ref('');
+
+
 
 const onVantFileChange = async (fileObj: any) => {
   // vant4 uploader 的 fileObj 结构：{ file: File, ... }
@@ -55,13 +84,24 @@ const onVantFileChange = async (fileObj: any) => {
   }
 };
 
+const onConfirmType = ({ selectedValues, selectedOptions }: { selectedValues: string[], selectedOptions: Option[] }) => {
+    console.log(selectedValues, selectedOptions[0].text);
+    contracttype.value = selectedOptions[0].text;
+    typePickerValue.value = selectedValues;
+    showType.value = false;
+};
+
+
 const contractAdd = (contractPath: string,nonce:string) => {
         loading.value = true;
         let contractInfo = { 
-            billcode: billcode.value, 
+            billcode: billcode.value,
             contracturl: contractPath,
+            ctradername: ctradername.value,
+            contracttype: contracttype.value,
+            issigned: 0,
             createtime: '',
-            signtime: ''
+            signtime: '',
         }
         if(validateData(contractInfo)===false){
             loading.value = false;
@@ -101,7 +141,6 @@ const onSubmit = () => {
         contractUrl.value.forEach((file: { file: File }) => {
             formData.append('file', file.file);
         });
-        console.log(formData);
         // 发送 POST 请求
         axios.post(`${DOMAIN_RUL}/workWeChart/contractUpload`, formData,{
             headers: {
@@ -112,13 +151,14 @@ const onSubmit = () => {
             if (response.data.code === 200) {
                 console.log('请求成功', response.data); 
                 contractPath = response.data.result;
-            if (contractPath === '') {
-                showToast('合同上传出错，请重新上传');
-                loading.value = false;
-                return;
-                }
+            
+                if (contractPath === '') {
+                    showToast('合同上传出错，请重新上传');
+                    loading.value = false;
+                    return;
+                    }
+                contractAdd(contractPath,nonce);
             }
-            contractAdd(contractPath,nonce);
             loading.value = false;
         })
         .catch(error => {

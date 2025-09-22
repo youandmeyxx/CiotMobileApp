@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts" name="AppHead">
-import '@/style/head.css';
+import '@/style/headStyle.css';
 import { showToast } from 'vant';
 const onClickLeft = () => {
   // 返回按钮点击事件处理
@@ -33,4 +33,18 @@ const onClickRight = () => {
 </script>
 
 <style scoped>
+  /* 电脑页面适配样式 */
+  @media (min-width: 768px) {
+    .desktop-page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 32px;
+    }
+    p {
+      font-size: 18px;
+    }
+  }
 </style>

@@ -138,7 +138,11 @@ const router = createRouter({
       name: 'contractwebsign',
       component: () => import('@/views/components/websign/contractwebsign.vue'),
     },
-  
+    {
+      path: '/contractList',
+      name: 'contractList',
+      component: () => import('@/views/components/websign/contractList.vue'),
+    },
   ],
 })
 

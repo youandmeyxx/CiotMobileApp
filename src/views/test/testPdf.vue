@@ -17,10 +17,10 @@ const props: any = defineProps({
  
 let pdfDoc: any = null
 const pdfPages: Ref = ref(0)
-const pdfScale: Ref = ref(1.3)
+const pdfScale: Ref = ref(1)
 const loadFile = async (url: any) => {
   // 设定pdfjs的 workerSrc 参数
-  PDFJS.GlobalWorkerOptions.workerSrc = 'pdfjs/pdf.worker.mjs'
+  PDFJS.GlobalWorkerOptions.workerSrc = '/pdf.worker.mjs'
   const loadingTask = PDFJS.getDocument(url)
   loadingTask.promise.then(async (pdf: any) => {
     pdfDoc = pdf // 保存加载的pdf文件流

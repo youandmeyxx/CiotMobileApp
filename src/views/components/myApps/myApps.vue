@@ -17,7 +17,6 @@
 </template>
 <script setup lang="ts" name="MyApps">
     import '@/style/custom.css';
-    import { ref } from 'vue';
     import { iconPath } from '@/views/components/myApps/assets/iconPath';
     import { useRouter } from 'vue-router';
     // 图标路径

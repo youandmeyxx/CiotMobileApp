@@ -65,9 +65,20 @@
                   collapse-text="收起"
                 />
                 <van-button type="primary" size="small" @click="getBillIdByBillcode(item.billid)">出货列表</van-button>
-                <div>超密:<van-text-ellipsis 
+                <div>详细信息:<van-text-ellipsis 
                   rows="3"
-                  :content="item.userdef1" 
+                  :content="'品牌名称:' +(item.userdef1===null?'':item.userdef1) + 
+                            '安装时间:' +(item.userdef2===null?'':item.userdef2) + 
+                            '沉默期:' +(item.userdef3===null?'':item.userdef3) +
+                            '设备sn号1:' +(item.userdef4===null?'':item.userdef4) +
+                            '设备sn号2:' +(item.userdef5===null?'':item.userdef5) +
+                            '套餐编号:' +(item.userdef6===null?'':item.userdef6) +
+                            '路由器:' +(item.userdef7===null?'':item.userdef7) +
+                            '卡号1:' +(item.userdef8===null?'':item.userdef8) +
+                            '卡号2:' +(item.userdef9===null?'':item.userdef9) +
+                            '其他:' +(item.userdef10===null?'':item.userdef10) +
+                            '卡号3:' +(item.userdef11===null?'':item.userdef11) +
+                            '卡号4:' +(item.userdef12===null?'':item.userdef12)"
                   expand-text="展开"
                   collapse-text="收起"
                   /></div>

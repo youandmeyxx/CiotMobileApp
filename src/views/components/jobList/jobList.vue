@@ -49,7 +49,17 @@
             <li>装维人员:{{ item.operator }}</li>
             <li>安装时间:{{ item.jobdate }}</li>
             <li>销售员:{{ item.empname }}</li>
-            <li>超密:{{ item.userdef1 }}</li>
+            <li>品牌名称:{{ item.userdef1 }}</li>
+            <li>安装时间:{{ item.userdef2 }}</li>
+            <li>沉默期:{{ item.userdef3 }}</li>
+            <li>设备sn号1:{{ item.userdef4 }}</li>
+            <li>设备sn号2:{{ item.userdef5 }}</li>
+            <li>套餐编号:{{ item.userdef6 }}</li>
+            <li>卡号1:{{ item.userdef7 }}</li>
+            <li>卡号2:{{ item.userdef8 }}</li>
+            <li>其他:{{ item.userdef9 }}</li>
+            <li>卡号3:{{ item.userdef10 }}</li>
+            <li>卡号4:{{ item.userdef12 }}</li>
           </ul>
           <van-button type="primary" size="small" @click="getBillIdByBillcode(item.billcode)">出货列表</van-button>
       </van-collapse-item>

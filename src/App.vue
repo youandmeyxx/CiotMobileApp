@@ -6,10 +6,8 @@
 </template>
 <script setup lang="ts">
   import AppHead from '@/components/appHead.vue';
-  import AppFoot from '@/components/appFoot.vue';
   import AppBody from '@/components/appBody.vue';
-
-
+  import AppFoot from '@/components/appFoot.vue';
 </script>
 <style scoped>
 

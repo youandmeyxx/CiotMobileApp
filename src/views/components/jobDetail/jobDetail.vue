@@ -11,7 +11,7 @@
           v-for="(item, index) in saleBillDetails"
           :key="index"
           :title="item.goodsname"
-          :label="`规格: ${item.specs}, 单位: ${item.unitname}, 数量: ${item.unitquantity}, 单价: ${item.unitprice},设备编号:${item.userdef7} ${item.userdef8} `"
+          :label="`规格: ${item.specs}, 单位: ${item.unitname}, 数量: ${item.unitquantity}, 单价: ${item.unitprice},设备编号:${item.userdef7} ${item.userdef8},备注:${item.remark} `"
         />
       </van-list>
     </div>
