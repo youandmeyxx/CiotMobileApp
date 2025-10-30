@@ -1,10 +1,12 @@
 import { DOMAIN_RUL } from "@/plugins/globalVariables";
 import router from "@/router";
-import { userInfoDetailStore, userInfoStore } from "@/stores/userInfoDetail";
+import { userInfoDetailStore, userInfoStore, userPermissionStore } from "@/stores/userInfoDetail";
 import axios from "axios";
 
 const userInfoDetail = userInfoDetailStore();
 const userInfo = userInfoStore();
+const userPermission = userPermissionStore();
+
 export function getRandomInt() {
 }
 
@@ -45,7 +47,9 @@ export const getUserinfoFromSession = () => {
   // 从 sessionStorage 中获取 userInfoDetail 数据
   const storedData = sessionStorage.getItem('userInfoDetail');
   // 从 sessionStorage 中获取 userInfo 数据
-  const storedUserInfo = sessionStorage.getItem('userInfo');
+  const storedUserInfo = sessionStorage.getItem('userInfo');      
+  // 检查 userPermission 数据是否存在
+  const storedUserPermission = sessionStorage.getItem('userPermission');
   // 检查 userInfoDetail 数据是否存在
   if (storedData) {
     // 解析存储的 JSON 数据
@@ -59,11 +63,17 @@ export const getUserinfoFromSession = () => {
         // 将 userInfo 数据解析并设置到相应的存储中
         userInfo.userInfo = JSON.parse(storedUserInfo);
       } 
+      if (storedUserPermission) {
+        // 将 userPermission 数据解析并设置到相应的存储中
+        userPermission.rolePermissions = JSON.parse(storedUserPermission);
+      }
     } else {
       // 数据已过期，清除 sessionStorage 中的 userInfoDetail 数据
       sessionStorage.removeItem('userInfoDetail');
       // 数据已过期，清除 sessionStorage 中的 userInfo 数据
       sessionStorage.removeItem('userInfo');
+      // 数据已过期，清除 sessionStorage 中的 userPermission 数据
+      sessionStorage.removeItem('userPermission');
       // 跳转到登录页面
       router.push("/home");
     }
@@ -78,7 +88,8 @@ export const setUserInfoToSession = () => {
     expiration: expirationTime
   };
   sessionStorage.setItem('userInfoDetail', JSON.stringify(dataToStore));
-  sessionStorage.setItem('userInfo', JSON.stringify(userInfo.userInfo))
+  sessionStorage.setItem('userInfo', JSON.stringify(userInfo.userInfo));
+  sessionStorage.setItem('userPermission', JSON.stringify(userPermission.rolePermissions));
 }
 
 

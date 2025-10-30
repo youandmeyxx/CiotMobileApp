@@ -1,7 +1,7 @@
 <template>
   <div style="margin: 0 auto">
   <van-nav-bar
-    title="上海创临"
+    :title="pageTitle"
     class="custom-nav-bar"
     left-text="返回"
     left-arrow
@@ -21,6 +21,25 @@
 <script setup lang="ts" name="AppHead">
 import '@/style/headStyle.css';
 import { showToast } from 'vant';
+import { useRoute, useRouter } from 'vue-router';
+import { ref, watch } from 'vue';
+
+// 获取路由实例
+const route = useRoute();
+const router = useRouter();
+
+// 当前页面标题
+const pageTitle = ref('上海创临');
+
+// 监听路由变化，更新标题
+watch(() => route.meta.title, (newTitle) => {
+  if (newTitle && typeof newTitle === 'string') {
+    pageTitle.value = newTitle;
+    // 同时更新浏览器标题
+    document.title = newTitle;
+  }
+}, { immediate: true });
+
 const onClickLeft = () => {
   // 返回按钮点击事件处理
   window.history.back();
@@ -30,6 +49,10 @@ const onClickRight = () => {
   // 搜索按钮点击事件处理
   showToast('搜索按钮点击');
 };
+
+// 在组件外部也可以通过这种方式访问当前路由的meta信息
+// console.log('当前路由meta:', route.meta);
+// console.log('当前页面标题:', route.meta.title);
 </script>
 
 <style scoped>

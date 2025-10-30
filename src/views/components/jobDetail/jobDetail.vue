@@ -1,3 +1,11 @@
+<!--
+ * @Author: youandmeyxx 86011640@qq.com
+ * @Date: 2025-09-28 13:05:07
+ * @LastEditors: youandmeyxx 86011640@qq.com
+ * @LastEditTime: 2025-10-28 08:43:37
+ * @FilePath: \CiotMobileApp\src\views\components\jobDetail\jobDetail.vue
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
 <template>
     <div>
       <van-nav-bar title="销售详情列表" left-arrow @click-left="$router.back()" />
@@ -23,6 +31,7 @@
     import { useRoute } from 'vue-router';
     import { DOMAIN_RUL } from '@/plugins/globalVariables';
     import axios from 'axios';
+import { getUserinfoFromSession } from '../support/function';
     const route = useRoute();
     const billid = route.query.billid; 
     const saleBillDetails = ref<SaleBillDetail[]>([]);
@@ -48,6 +57,7 @@
     };
   
   onMounted(() => {
+    getUserinfoFromSession();
     onLoad();
   });
   </script>

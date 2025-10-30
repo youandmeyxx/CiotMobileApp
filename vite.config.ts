@@ -4,7 +4,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 // @ts-ignore
-import postcssPxToViewport from 'postcss-px-to-viewport'
+// import postcssPxToViewport from 'postcss-px-to-viewport'
 
 // https://vite.dev/config/
 export default defineConfig({

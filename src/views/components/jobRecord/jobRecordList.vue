@@ -74,6 +74,7 @@
     import { DOMAIN_RUL } from '@/plugins/globalVariables';
 import { userInfoDetailStore, userInfoStore } from '@/stores/userInfoDetail';
 import router from '@/router';
+import { getUserinfoFromSession } from '../support/function';
     const assignJobData = ref<setuprecord[]>([]);
     const  operator = ref('');
     const  ctradername = ref('');
@@ -81,6 +82,12 @@ import router from '@/router';
     const billid = ref('');
     const userInfoDetail = userInfoDetailStore();
     const userInfo = userInfoStore();
+
+    onMounted(() => {
+      // 从 sessionStorage 中读取 userInfoDetail 和 userInfo
+      getUserinfoFromSession();
+      console.log("userInfoDetail:",userInfoDetail.userInfoDetail);
+    });
 
     function handleImageClick(url: string) {
         showImagePreview([url]);
@@ -105,10 +112,14 @@ import router from '@/router';
 
     }
     function getrecordList() {
+      console.log("operator:",operator.value);
+      console.log("ctradername:",ctradername.value);
+      console.log("userInfoDetail:",userInfoDetail.userInfoDetail);
       axios.get(`${DOMAIN_RUL}/workWeChart/recordList`,{
         params: {
             operator: operator.value,
-            ctradername: ctradername.value
+            ctradername: ctradername.value,
+            empname: userInfo.userInfo.name,
         }
       })
             .then(response => {

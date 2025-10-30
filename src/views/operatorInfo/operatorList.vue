@@ -7,7 +7,6 @@
       v-model:loading="loading"
       v-model:finished="finished"
       :immediate-check="false"
-      @load="onLoad"
     >
         <van-cell-group v-for="(item, index) in users" :key="index" :title="item.name">
           <van-cell :title="`用户 ID: ${item.userid}`" />
@@ -15,6 +14,7 @@
           <van-cell :title="`姓名: ${item.name}`" />
           <van-cell :title="`手机: ${item.mobile}`" />
           <van-cell :title="`邮箱: ${item.email}`" />
+          <van-cell :title="`角色: ${item.roleName}`" />
           <van-cell>
             <!-- 修改用户按钮 -->
             <van-button type="warning" @click="openEditModal(item)">修改</van-button>
@@ -33,6 +33,15 @@
         <van-field name="name" v-model="newUser.name" label="姓名" required />
         <van-field name="mobile" v-model="newUser.mobile" label="手机" required />
         <van-field name="email" v-model="newUser.email" label="邮箱" required />
+        <van-field
+          v-model="newUser.roleName"
+          is-link
+          readonly
+          name="roleName"
+          label="角色:"
+          placeholder="点击选择角色"
+          @click="beforeShow()"
+        />
         <van-button type="primary" @click="addUser">确定</van-button>
         <van-button @click="addModalVisible = false">取消</van-button>
       </div>
@@ -47,11 +56,28 @@
         <van-field v-model="editedUser.name" label="姓名" required />
         <van-field v-model="editedUser.mobile" label="手机" required />
         <van-field v-model="editedUser.email" label="邮箱" required />
+        <van-field
+          v-model="editedUser.roleName"
+          is-link
+          readonly
+          name="roleName"
+          label="角色:"
+          placeholder="点击选择角色"
+          @click="beforeShow()"
+        />
         <van-button type="primary" @click="updateUser">确定</van-button>
         <van-button @click="editModalVisible = false">取消</van-button>
       </div>
     </van-popup>
   </div>
+        <van-popup v-model:show="showPicker" destroy-on-close position="bottom">
+                <van-picker
+                    :columns="columns"
+                    :model-value="pickerValue"
+                    @confirm="onConfirm"
+                    @cancel="showPicker = false"
+                />
+    </van-popup>
 </template>
 
 <script lang="ts" setup>
@@ -61,9 +87,25 @@ import { onMounted, ref } from 'vue';
 import type { userDetail } from '../components/support/interface';
 import { showToast } from 'vant';
 import { userInfoDetailStore, userInfoStore } from '@/stores/userInfoDetail';
+import type {Option} from '@/views/components/support/interface.ts';
 
 const userInfoDetail = userInfoDetailStore();
 const userInfo = userInfoStore();
+
+    // 点击选择角色
+    const onConfirm = ({ selectedValues, selectedOptions }: { selectedValues: string[], selectedOptions: Option[] }) => {
+      console.log(selectedValues, selectedOptions[0].text);
+      editedUser.value.roleName = selectedOptions[0].text;
+      newUser.value.roleName = selectedOptions[0].text;
+      pickerValue.value = selectedValues;
+      showPicker.value = false;
+    };
+
+const pickerValue = ref<string[]>([]);
+// 定义选择器是否显示
+const showPicker = ref(false);
+// 定义角色列表
+const columns = ref<any[]>([]);
 
 // 用户数据
 const users = ref<userDetail[]>([]);
@@ -77,15 +119,33 @@ const addModalVisible = ref(false);
 // 修改用户模态框显示状态
 const editModalVisible = ref(false);
 // 新用户对象
-const newUser = ref({ userid: '', password: '', name: '', mobile: '', email: '',gender:0,avatar:'',qrCode:'' });
+const newUser = ref({ userid: '', password: '', name: '', mobile: '', email: '',gender:0,avatar:'',qrCode:'',roleName:'' });
 // 编辑中的用户对象
-const editedUser = ref({ userid: '', password: '', name: '', mobile: '', email: '',gender:0,avatar:'',qrCode:'' });
+const editedUser = ref({ userid: '', password: '', name: '', mobile: '', email: '',gender:0,avatar:'',qrCode:'',roleName:'' });
 onMounted( () => {
     getuserInfoList();
 });
-// 加载数据
-const onLoad = () => {
+
+    // 在 van-popup 显示前执行的函数
+const beforeShow = () => {
+  // console.log('Popup is about to show');
+  // 发送 GET 请求
+  axios.get(`${DOMAIN_RUL}/workWeChart/rolePermissions/getRolePopList`)
+        .then(response => {
+          console.log('请求成功', response.data.result);
+          columns.value = response.data.result
+          //充data中获取装维人员数据
+          showPicker.value = true
+          // 在这里处理响应数据
+        })
+        .catch(error => {
+          console.error('请求失败', error);
+          // 在这里处理错误
+        });
 };
+
+
+
 //读取用户信息
 const getuserInfoList = () => {
     // 通过get请求获取用户列表
@@ -100,7 +160,7 @@ const getuserInfoList = () => {
 // 打开添加用户模态框
 const openAddModal = () => {
   addModalVisible.value = true;
-  newUser.value = { userid: '', password: '', name: '', mobile: '', email: '',gender:0,avatar:'',qrCode:'' };
+  newUser.value = { userid: '', password: '', name: '', mobile: '', email: '',gender:0,avatar:'',qrCode:'',roleName:'' };
 };
 // 添加用户
 const addUser = () => {
@@ -120,7 +180,8 @@ const addUser = () => {
       email: newUser.value.email,
       gender:0,
       avatar: '',
-      qrCode: ''
+      qrCode: '',
+      roleName: newUser.value.roleName
     }
   console.log('提交的数据:', opertaors);
   //发送post请求 添加信息
@@ -155,7 +216,8 @@ const updateUser = () => {
       email: editedUser.value.email,
       gender:0,
       avatar: '',
-      qrCode: ''
+      qrCode: '',
+      roleName: editedUser.value.roleName   
     }
     //发送post请求 修改信息
   axios.post(`${DOMAIN_RUL}/workWeChart/modOperatorInfo`,users.value[index])

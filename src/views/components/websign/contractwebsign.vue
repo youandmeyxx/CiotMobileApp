@@ -65,7 +65,7 @@ import '@/style/custom.css';
 import { nextTick, onMounted, onUnmounted, ref, watchEffect, type Ref } from 'vue';
 import Loading from '@/components/Loading.vue';
 import {  showToast, Toast  } from 'vant';
-import { generateNonce } from '../support/function';
+import { generateNonce, getUserinfoFromSession } from '../support/function';
 import { renderAsync } from 'docx-preview';
 import axios from 'axios';
 import { DOMAIN_RUL } from '@/plugins/globalVariables';
@@ -75,7 +75,6 @@ import ImageModule from 'docxtemplater-image-module-free';
 import Docxtemplater from 'docxtemplater';
 import PizZip from 'pizzip';
 import { saveAs } from 'file-saver';
-import PdfView from '@/views/test/testPdf.vue';
 
 //****************************************************************
 const route = useRoute();
@@ -110,6 +109,7 @@ const vueEsignRef = ref<InstanceType<typeof Vue3Esign>>();
 
 // 初始化尺寸监听
 onMounted(() => {
+  getUserinfoFromSession();
   // jspdf.value = `${DOMAIN_RUL}/contract/${contractPath}.pdf`;
   //下载合同
   downloadAndDocx();
@@ -219,7 +219,7 @@ function clearCanves(): void {
 const saveCanves = async () => {
   try {
     const base64Data = await vueEsignRef.value.generate()
-    // console.log('res', base64Data)
+    console.log('res', base64Data)
     img.value = base64Data
     //
     if (!docBlob.value || !img.value) {
@@ -269,6 +269,7 @@ const saveCanves = async () => {
     clearCanves();
   }
   catch (error) {
+    console.error('渲染文档失败:', error);
     showToast('请先签字');
     img.value = ''
   }

@@ -211,6 +211,7 @@ const saleBillData = ref<SaleBill>({
     onMounted(() => {
         console.log('onMounted执行getJobInfo');
         getUserinfoFromSession();
+        
         getJobInfo(billcode.value);
     });
 

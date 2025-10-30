@@ -47,7 +47,7 @@
 </template>
 <script setup lang="ts">
 import '@/style/custom.css';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 const fieldNames = ['billcode','tel', 'addr', 'contact', 'carrier', 'realnametype', 'cusName', 'contracttype', 'routername', 'setupdate', 'topology'];
 // 使用 Object.fromEntries 批量创建 ref 变量
 const { billcode, tel, addr, contact, carrier, realnametype, cusname, routertype, routername, setupdate, topology } = Object.fromEntries(fieldNames.map(name => [name, ref('')]));
@@ -56,7 +56,7 @@ import { renderAsync } from 'docx-preview';
 import loading from 'vant/lib/loading';
 import { showToast } from 'vant';
 import axios from 'axios';
-import { generateNonce } from '../support/function';
+import { generateNonce, getUserinfoFromSession } from '../support/function';
 import { DOMAIN_RUL } from '@/plugins/globalVariables';
 import type { Option } from '@/views/components/support/interface.ts';
 import router from '@/router';
@@ -69,6 +69,10 @@ const previewContainer = ref<HTMLDivElement | null>(null);
 const typePickerValue = ref<string[]>([]);
 const contractPath = ref('');
 const ctradername = ref('');
+
+onMounted(() => {
+    getUserinfoFromSession();
+});
 
 
 

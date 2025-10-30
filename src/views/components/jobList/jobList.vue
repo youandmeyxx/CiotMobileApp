@@ -8,12 +8,18 @@
       placeholder="请输入搜索关键词"
     >
   </van-search>
-    <van-search
+  <van-search
+      v-model="userdef1"
+      label="品牌名称:"
+      placeholder="请输入搜索关键词"
+    >
+  </van-search>
+  <van-search
       v-model="operator"
       label="装维人员:"
       placeholder="请输入搜索关键词"
     >
-    </van-search>
+  </van-search>
     <div class="button-container">
       <van-button
         plain
@@ -68,20 +74,31 @@
 </div>
 </template>
 <script setup lang="ts" home="JobList">
-  import { ref } from 'vue';
+  import { onMounted, ref } from 'vue';
   import { showToast } from 'vant';
   import '@/style/custom.css';
   import type { setuprecord, CalendarValue,Option,SaleBill} from '@/views/components/support/interface.ts';
 import axios from 'axios';
 import { DOMAIN_RUL } from '@/plugins/globalVariables';
 import router from '@/router';
+import { getUserinfoFromSession } from '../support/function';
+import { userInfoDetailStore, userInfoStore } from '@/stores/userInfoDetail';
   const operator = ref('');
   const ctradername =ref(''); 
   const activeName = ref('1');
   const billid = ref('');
+  const userdef1 = ref('');
+  const userInfoDetail = userInfoDetailStore();
+  const userInfo = userInfoStore();
       //装维单数据
   const jobData = ref<SaleBill[]>([]);
   
+  onMounted(() => {
+    // 从 sessionStorage 中读取 userInfoDetail 和 userInfo
+    getUserinfoFromSession();
+  });
+
+
   const onSearch = () =>{
 
   };
@@ -89,7 +106,9 @@ import router from '@/router';
     axios.get(`${DOMAIN_RUL}/workWeChart/jobList`,{
       params: {
         operator: operator.value,
-        tradername: ctradername.value
+        tradername: ctradername.value,
+        userdef1: userdef1.value,
+        empname: userInfo.userInfo.name,
       }
     })
     .then(response => {

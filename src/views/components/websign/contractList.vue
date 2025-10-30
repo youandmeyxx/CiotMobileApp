@@ -23,6 +23,7 @@
             placeholder="请输入搜索关键词"
             >
             </van-search>
+            <van-cell title="选择日期范围查询" :value="signDate" @click="showSignDate = true" />
             <div>
                 <van-button
                     plain
@@ -32,10 +33,18 @@
                 >
                     搜索
                 </van-button>
+                <van-button
+                    plain
+                    icon="search"
+                    type="primary"
+                    @click="exportToExcel"
+                >
+                    导出
+                </van-button>
             </div>
             <div>
                 <van-collapse v-model="activeName" accordion>
-                    <van-collapse-item v-for="(item, index) in contractData" :key="index" :title="item.billcode + ' ' + item.ctradername + ' ' + item.contracttype" :name="index">
+                    <van-collapse-item v-for="(item, index) in contractData" :key="index" :title="item.billcode + ' ' + item.ctradername + ' ' + item.contracttype + ' ' + item.signtime" :name="index">
                         <div>
                         <ul>
                             <li>合同类型:{{ item.contracttype }}</li>
@@ -45,6 +54,9 @@
                         </ul>
                         <ul>
                             <li>销售单号:{{ item.billcode }}</li>
+                        </ul>
+                        <ul>
+                            <li>签订时间:{{ item.signtime }}</li>
                         </ul>
                         </div>
                         <van-button type="primary" size="small" @click="contractReview(item.contracturl)">合同预览</van-button>
@@ -67,22 +79,26 @@
             <div
             ref="previewContainer"></div>
             <div class="button-group">
-            <van-button @click="saveAsDocx(contractPath)">下载</van-button>
+            <van-button v-if="userInfoDetail.userInfoDetail.roleName === 'admin'||userInfoDetail.userInfoDetail.roleName === '售后运营'" @click="saveAsDocx(contractPath)">下载</van-button>
             <van-button @click="showPopup = false">关闭</van-button>
             </div>
         </div>
     </van-popup>
+    <van-calendar v-model:show="showSignDate" type="range" @confirm="onConfirmSignDate"  :min-date="minDate" :max-date="maxDate" />
 </template>
 <script setup lang="ts">
-    import { ref } from 'vue';
+    import { onMounted, ref } from 'vue';
     import { showToast, Toast } from 'vant';
     import '@/style/custom.css';
     import axios from 'axios';
     import { DOMAIN_RUL } from '@/plugins/globalVariables';
-    import type { contractInfo } from '../support/interface';
+    import type { CalendarValue, contractInfo } from '../support/interface';
     import { renderAsync } from 'docx-preview';
     import { saveAs } from 'file-saver';
-
+    import { getUserinfoFromSession } from '../support/function';
+    import { userInfoDetailStore, userInfoStore } from '@/stores/userInfoDetail';
+    type CalendarV = Date | [Date, Date]; // Define CalendarValue type locally
+    import * as XLSX from 'xlsx';
     const ctradername =ref(''); 
     const activeName = ref('1');
     const billcode = ref('');
@@ -91,9 +107,84 @@
     const arrayBuffer = ref<ArrayBuffer | null>(null);
     const previewContainer = ref<HTMLDivElement | null>(null);
     const contractPath = ref('');
+    const showSignDate = ref(false);
+    const minDate = new Date(2010, 0, 1);
+    const maxDate = new Date(2099, 11, 31);
+    const signDateStart= ref('');
+    const signDateEnd= ref('');
+    const signDate=ref('')
 // 控制Popup显示状态
     const showPopup = ref(false);
     const docBlob = ref<Blob | null>(null)
+    const userInfoDetail = userInfoDetailStore();
+    const userInfo = userInfoStore();
+
+
+    onMounted(() => {
+        getUserinfoFromSession();
+    });
+    
+    /**
+     * 
+     * @param value 签订时间范围
+     */
+    const onConfirmSignDate = (value: CalendarV): void => {
+      let start: Date | null = null;
+      let end: Date | null = null;
+      
+      if (Array.isArray(value)) {
+        [start, end] = value;
+      } else {
+        start = value;
+        end = value;
+      }
+      showSignDate.value = false;
+      signDateStart.value = formatDate(start);
+      signDateEnd.value = formatDate(end);
+      console.log('开始日期:', signDateStart.value);
+      console.log('结束日期:', signDateEnd.value);
+      signDate.value = signDateStart.value + '至' + signDateEnd.value;
+    };
+
+    // 导出数据到Excel
+    const exportToExcel = () => {
+        if (contractData.value.length === 0) {
+            alert('暂无数据可导出');
+            return;
+        }
+
+        // 合并两个数据源
+        const allData = [...contractData.value];
+
+        // 准备导出的数据格式
+        const exportData = allData.map(item => ({
+            '单据编号': item.billcode,
+            '客户名': item.ctradername,
+            '合同类型': item.contracttype,
+            '是否签订': item.issigned === 1 ? '是' : '否',
+            '创建时间': item.createtime,
+            '签订时间': item.signtime,
+        }));
+
+        // 创建工作簿
+        const wb = XLSX.utils.book_new();
+        // 创建工作表
+        const ws = XLSX.utils.json_to_sheet(exportData);
+        // 将工作表添加到工作簿
+        XLSX.utils.book_append_sheet(wb, ws, '合同列表');
+        // 生成Excel文件
+        const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        // 保存文件
+        saveAsExcelFile(excelBuffer, '合同列表');
+    }
+
+    // 保存Excel文件的辅助函数
+    const saveAsExcelFile = (buffer: any, fileName: string) => {
+        const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+        const EXCEL_EXTENSION = '.xlsx';
+        const data = new Blob([buffer], { type: EXCEL_TYPE });
+        saveAs(data, fileName + '_' + new Date().toLocaleDateString() + EXCEL_EXTENSION);
+    }
 
     const onSearch = () =>{
         axios.get(`${DOMAIN_RUL}/workWeChart/contractList`,{
@@ -101,6 +192,9 @@
             ctradername: ctradername.value,
             billcode: billcode.value,
             contracttype: contracttype.value,
+            dateStart: signDateStart.value,
+            dateEnd: signDateEnd.value,
+            empname: userInfo.userInfo.name
         }
         })
         .then(response => {
@@ -186,7 +280,15 @@
     }
     saveAs(docBlob.value, contractPath);
     }
-
+    
+    const formatDate = (date: CalendarValue) => {
+      const year = date.getFullYear();
+      // 确保月份为两位数
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      // 确保日期为两位数
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
 
 </script>
 <style scoped>

@@ -1,3 +1,11 @@
+<!--
+ * @Author: youandmeyxx 86011640@qq.com
+ * @Date: 2025-09-28 13:05:07
+ * @LastEditors: youandmeyxx 86011640@qq.com
+ * @LastEditTime: 2025-10-29 08:17:21
+ * @FilePath: \CiotMobileApp\src\views\components\login\login.vue
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
 <template>
     <div class="login-container">
         <van-form @submit="onSubmit">
@@ -31,18 +39,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref,onMounted } from 'vue';
 import { showToast } from 'vant';
 import { DOMAIN_RUL } from '@/plugins/globalVariables';
 import axios from 'axios';
 import router from '@/router';
-import { userInfoDetailStore, userInfoStore } from '@/stores/userInfoDetail';
+import { userInfoDetailStore, userInfoStore, userPermissionStore } from '@/stores/userInfoDetail';
 import { setUserInfoToSession } from '../support/function';
-// import * as ww from '@wecom/jssdk'
-
+import { useRoute } from 'vue-router';
+const route = useRoute();
 const userInfoDetail = userInfoDetailStore();
 const userInfo = userInfoStore();
-// 假设你已经引入了 WECOM-JSSDK
+const userPermission = userPermissionStore();
+
+const userTicket = route.query.userTicket; // 
+const accessToken = route.query.access_token; // 
+
+
 
 const username = ref('');
 const password = ref('');
@@ -65,6 +78,8 @@ const onSubmit = () => {
                 userInfoDetail.userInfoDetail = res.data.result.userInfoDetail;
                 userInfo.userInfo = res.data.result.userInfo;
                 // 将 userInfoDetail 存入 sessionStorage
+                userPermission.rolePermissions = res.data.result.setupPermissions;
+                console.log('User rolePermissions:', userPermission.rolePermissions);
                 setUserInfoToSession();
                 // 登录成功，跳转到其他页面
                 router.push("/home");
@@ -85,6 +100,34 @@ const onForgotPassword = () => {
     showToast('跳转到忘记密码页面');
     // Add your forgot password logic here
 };
+
+onMounted( () => {
+    
+  // Get user info detail 需要返回权限信息。
+  if(userInfoDetail.userInfoDetail.userid == '') {
+      axios.get(`${DOMAIN_RUL}/workWeChart/userInfoDetail`, {
+        params: {
+          userTicket: userTicket,
+          accessToken: accessToken
+          
+        }
+      }).then((response) => {
+        userInfoDetail.userInfoDetail = response.data.result.userInfoDetail;
+        userInfo.userInfo = response.data.result.userInfo;
+        userPermission.rolePermissions = response.data.result.setupRolePermissions;
+        console.log('User rolePermissions:', userPermission.rolePermissions);
+        console.log('User info:', userInfo.userInfo);
+              // 将 userInfoDetail 存入 sessionStorage
+        setUserInfoToSession();
+        router.push("/home");
+      }).catch((error) => {
+        console.log('Error:', error);
+        //读取用户信息失败显示登录界面
+        router.push("/login");
+      });
+  }
+});
+
 
 </script>
 

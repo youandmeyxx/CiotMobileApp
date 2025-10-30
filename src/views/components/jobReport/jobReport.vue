@@ -1,7 +1,7 @@
 <template>
     <div>
     <div class="custom-div-title">装维登记报表</div>
-    <van-cell title="选择单个日期查询" :value="jobDate" @click="showJobDate = true" />
+    <van-cell title="选择日期范围查询" :value="jobDate" @click="showJobDate = true" />
     <van-search
       v-model="ctradername"
       label="客户名:"
@@ -49,6 +49,8 @@
   import { DOMAIN_RUL } from '@/plugins/globalVariables';
   // 引入 xlsx 库
   import * as XLSX from 'xlsx'; 
+import { getUserinfoFromSession } from '../support/function';
+import { userInfoDetailStore, userInfoStore } from '@/stores/userInfoDetail';
 
   const assignJobData = ref<setuprecord[]>([]);
   const  operator = ref('');
@@ -59,9 +61,12 @@
   const jobDateStart= ref('');
   const jobDateEnd= ref('');
   const jobDate=ref('')
-
+  const userInfoDetail = userInfoDetailStore();
+  const userInfo = userInfoStore();
+  
   onMounted(() => {
-      getrecordList(); 
+    getUserinfoFromSession();
+    getrecordList(); 
   })
   function getrecordList() {
     console.log('执行getrecordList'+jobDateStart.value);
@@ -70,7 +75,8 @@
             operator: operator.value,
             ctradername: ctradername.value,
             dateStart: jobDateStart.value,
-            dateEnd: jobDateEnd.value
+            dateEnd: jobDateEnd.value,
+            empname: userInfoDetail.userInfoDetail.name
         }
     })
     .then(response => {

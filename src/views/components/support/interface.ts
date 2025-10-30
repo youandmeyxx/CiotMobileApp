@@ -96,6 +96,7 @@ export interface userDetail {
   gender : number;
   avatar : string;
   qrCode : string;
+  roleName : string;
 }
 
 export interface userInfo {
@@ -213,4 +214,24 @@ export interface RenderOptions {
 	showChanges?: boolean; // 启用文档更改的实验性渲染（插入/删除）
 	debug?: boolean; // 启用额外的日志记录
 }
+
+export interface Permission {
+  permissionCode: string;
+  permissionName: string;
+  resourceType: string;
+  description: string;
+  resourcePath: string;
+  parentId: number;
+
+}
+
+// 角色信息
+export interface SetupRoles {
+  roleName: string;
+  description: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 
