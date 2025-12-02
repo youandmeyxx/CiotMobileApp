@@ -103,10 +103,7 @@ const signContainerRef = ref<HTMLDivElement | null>(null);
 const showPopup = ref(false);
 // 签名组件引用
 const vueEsignRef = ref<InstanceType<typeof Vue3Esign>>();
-
-
 //****************************************************************
-
 // 初始化尺寸监听
 onMounted(() => {
   getUserinfoFromSession();
@@ -243,7 +240,7 @@ const saveCanves = async () => {
       }
       return uint8Array;
     },
-      getSize: () => [100, 50], // 图片尺寸 [宽度, 高度]
+      getSize: () => [150, 75], // 图片尺寸 [宽度, 高度]
     });
 
     // 加载文档和模块
