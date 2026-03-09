@@ -14,6 +14,8 @@
           <li>实名类型:{{ item.realnametype }}</li>
           <li>店铺路由器:{{ item.routertype }}</li>
           <li>路由器型号:{{ item.routername }}</li>
+          <li v-if="item.assigntype === '维修更换'">更换设备SN号:{{ item.devicesn }}</li>
+          <li v-if="item.assigntype === '维修更换'">更换路由器SN号:{{ item.routersn }}</li>
           <li>安装后应用:{{ item.aftersetup }}</li>
           <li>安装日期:{{ item.setupdate }}</li>
           <li>审核类型:{{ item.verifytype }}</li>
@@ -78,6 +80,8 @@ import router from '@/router';
         contact: '',
         tel: '',
         operator: '',
+        routersn: '',
+        devicesn: '',
         topology: '',
         routertype: '',
         routername: '',

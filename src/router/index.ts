@@ -151,7 +151,7 @@ const router = createRouter({
       path: '/aihuaPLCZ',
       name: 'aihuaPLCZ',
       meta: {
-        title: '大华查询',
+        title: '大华批量充值',
       },
       component: () => import('@/views/components/aihua/aihuaPLCZ.vue'),
     },
@@ -254,6 +254,30 @@ const router = createRouter({
         },
         component: () => import('@/views/test/RouteMetaDemo.vue'),
       },
+      {
+        path: '/PackageUpgrade',
+        name: 'PackageUpgrade',
+        meta: {
+          title: '套餐升级',
+        },
+        component: () => import('@/views/components/IOTV3/packageUpgrade/PackageUpgrade.vue'),
+      },
+      {
+        path: '/PackageWork',
+        name: 'PackageWork',
+        meta: {
+          title: '套餐工作',
+        },
+        component: () => import('@/views/components/IOTV3/packageWork/PackageWork.vue'),
+      },
+      {
+      path: '/BarcodeScanner',
+      name: 'BarcodeScanner',
+      meta: {
+        title: '测试BarcodeScanner',
+      },
+      component: () => import('@/views/test/BarcodeScanner.vue'),
+    },
 
   ],
 })

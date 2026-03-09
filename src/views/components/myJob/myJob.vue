@@ -8,7 +8,7 @@
         <van-tab title="待执行" name="toExec">
           <div>
             <van-collapse v-model="collapse" accordion>
-              <van-collapse-item v-for="(item, index) in myUnFinishJobData" :key="index" :title="item.jobdate +' '+ item.billcode +  item.ctradername" :name="index">
+              <van-collapse-item v-for="(item, index) in myUnFinishJobData" :key="index" :title=" item.userdef1 +item.jobdate +' '+ item.billcode +  item.ctradername " :name="index">
                 <ul>
                   <li>任务类型:{{ item.assigntype }}</li>
                 </ul>

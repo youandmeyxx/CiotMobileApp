@@ -33,10 +33,10 @@
   </div>
   <div>
     <van-collapse v-model="activeName" accordion>
-      <van-collapse-item v-for="(item, index) in jobData" :key="index" :title="item.ctradername" :name="index">
+      <van-collapse-item v-for="(item, index) in jobData" :key="index" :title="item.ctradername + ' ' + item.userdef1 + ' ' + item.assigntype + ' ' + item.jobdate + ' ' + item.empname" :name="index">
         <div>
           <ul>
-            <li>任务类型:{{ item.assigntype }}</li>
+            <li>任务类型:{{ item.assigntype }};</li>
           </ul>
           详情:
           <van-text-ellipsis
@@ -61,10 +61,11 @@
             <li>设备sn号1:{{ item.userdef4 }}</li>
             <li>设备sn号2:{{ item.userdef5 }}</li>
             <li>套餐编号:{{ item.userdef6 }}</li>
-            <li>卡号1:{{ item.userdef7 }}</li>
-            <li>卡号2:{{ item.userdef8 }}</li>
-            <li>其他:{{ item.userdef9 }}</li>
-            <li>卡号3:{{ item.userdef10 }}</li>
+            <li>路由器:{{ item.userdef7 }}</li>
+            <li>卡号1:{{ item.userdef8 }}</li>
+            <li>卡号2:{{ item.userdef9 }}</li>
+            <li>其他:{{ item.userdef10 }}</li>
+            <li>卡号3:{{ item.userdef11 }}</li>
             <li>卡号4:{{ item.userdef12 }}</li>
           </ul>
           <van-button type="primary" size="small" @click="getBillIdByBillcode(item.billcode)">出货列表</van-button>

@@ -3,6 +3,12 @@
     <div class="custom-div-title">装维登记列表</div>
     <div>
     <van-search
+      v-model="billcode"
+      label="销售单号:"
+      placeholder="请输入搜索关键词"
+    >
+  </van-search>
+    <van-search
       v-model="ctradername"
       label="客户名:"
       placeholder="请输入搜索关键词"
@@ -26,7 +32,7 @@
     </div>
   </div>
     <van-collapse v-model="activeName" accordion>
-      <van-collapse-item v-for="(item, index) in assignJobData" :key="index" :title="item.cusname" :name="index">
+      <van-collapse-item v-for="(item, index) in assignJobData" :key="index" :title="item.cusname+'('+item.billcode+')'+'('+item.assigntype+')'+'('+item.carrier+')'" :name="index">
         <ul>
           <li>任务类型:{{ item.assigntype }}</li>
           <li>地址:{{ item.addr }}</li>
@@ -60,6 +66,8 @@
         </ul>
         <div class="button-container">
           <van-button type="primary" size="small" @click="deVerifyRecord(item.jobid)">反审核</van-button>
+          <!-- <van-button type="primary" size="small" @click="repairApply(item.jobid,'维修更换')">维修申请</van-button>
+          <van-button type="primary" size="small" @click="repairApply(item.jobid,'拆机')">拆机申请</van-button> -->
         </div>
       </van-collapse-item>
     </van-collapse> 
@@ -70,7 +78,7 @@
     import { onMounted, ref } from 'vue';
     import axios from 'axios';
     import type { setuprecord } from '../support/interface';
-    import { showImagePreview } from 'vant';
+    import { showImagePreview, showToast } from 'vant';
     import { DOMAIN_RUL } from '@/plugins/globalVariables';
 import { userInfoDetailStore, userInfoStore } from '@/stores/userInfoDetail';
 import router from '@/router';
@@ -80,6 +88,7 @@ import { getUserinfoFromSession } from '../support/function';
     const  ctradername = ref('');
     const activeName = ref('1');
     const billid = ref('');
+    const billcode = ref('');
     const userInfoDetail = userInfoDetailStore();
     const userInfo = userInfoStore();
 
@@ -93,6 +102,42 @@ import { getUserinfoFromSession } from '../support/function';
         showImagePreview([url]);
     }
 
+    
+    /**
+    * @description: 维修申请
+    * @param {number} jobid
+    * @param {string} empname
+    * @return {*}
+    */
+    const repairApply = (jobid:number,applyType:string) =>{
+      axios.get(`${DOMAIN_RUL}/workWeChart/repairApply`,{
+        params: {
+          jobid: jobid
+          ,empname: userInfo.userInfo.name
+          ,applyType: applyType
+        }
+      })
+            .then(response => {
+                if (response.data.code === 200) {
+                  console.log(response.data.result);
+                  //提示框申请成功
+                  showToast('申请成功');
+                }else if(response.data.code === 400){
+                  //提示框申请失败
+                  showToast(response.data.message);
+                }
+            })
+            .catch(error => {
+            console.error('请求失败', error);
+            // 在这里处理错误
+            });
+    }
+
+    /**
+    * @description: 反审核
+    * @param {number} jobid
+    * @return {*}
+    */
     const deVerifyRecord = (jobid:number) => {
       axios.get(`${DOMAIN_RUL}/workWeChart/deVerifyRecord`,{
         params: {
@@ -120,6 +165,7 @@ import { getUserinfoFromSession } from '../support/function';
             operator: operator.value,
             ctradername: ctradername.value,
             empname: userInfo.userInfo.name,
+            billcode: billcode.value
         }
       })
             .then(response => {

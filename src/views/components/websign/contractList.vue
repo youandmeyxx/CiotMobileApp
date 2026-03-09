@@ -24,6 +24,14 @@
             >
             </van-search>
             <van-cell title="选择日期范围查询" :value="signDate" @click="showSignDate = true" />
+            <div class="radio-group-container">
+                <span class="radio-group-label">是否已签订合同:</span>
+                <van-radio-group v-model="issigned" direction="horizontal">
+                    <van-radio name="">全部</van-radio>
+                    <van-radio name="1">已签订</van-radio>
+                    <van-radio name="0">未签订</van-radio>
+                </van-radio-group>
+            </div>
             <div>
                 <van-button
                     plain
@@ -110,6 +118,7 @@
     const showSignDate = ref(false);
     const minDate = new Date(2010, 0, 1);
     const maxDate = new Date(2099, 11, 31);
+    const issigned = ref('');
     const signDateStart= ref('');
     const signDateEnd= ref('');
     const signDate=ref('')
@@ -194,7 +203,8 @@
             contracttype: contracttype.value,
             dateStart: signDateStart.value,
             dateEnd: signDateEnd.value,
-            empname: userInfo.userInfo.name
+            empname: userInfo.userInfo.name,
+            issigned: issigned.value,
         }
         })
         .then(response => {

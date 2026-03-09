@@ -20,10 +20,22 @@
         <van-search
         v-model="ctradername"
         show-action
-        label="客户名称:"
+        label="客户铺名:"
         placeholder="请输入搜索关键词"
         >
         </van-search>
+                <van-search
+        v-model="userdef1"
+        show-action
+        label="品牌名称:"
+        placeholder="请输入搜索关键词"
+        >
+        </van-search>
+
+        <van-dropdown-menu>
+        <van-dropdown-item v-model="assignType" :options="assignTypeOptions" @change="cleardata"/>
+        </van-dropdown-menu>
+
         <div class="button-container">
         <van-button
           plain
@@ -35,25 +47,22 @@
           搜索
         </van-button>
     </div>
+    
   <div class="custom-div-title">任务分配</div>
 
 
 
     <van-form @submit="onSubmit">
-      <van-radio-group v-model="assignType" direction="horizontal">
-        <van-radio name="新装" :checked="assignType === '新装'">新装</van-radio>
-        <van-radio name="维修更换">维修更换</van-radio>
-        <van-radio name="拆机">拆机</van-radio>
-        <van-radio name="已分配">已分配</van-radio>
-      </van-radio-group>
         <div  v-for="(item, index) in assignJobData" :key="index">
             <van-cell>
                 <template #title>
                     <span class="custom-title">{{item.billcode}}</span>
                 </template>
                 <template #right-icon>
-                    <van-button v-if="assignType != '已分配'" type="primary"  size="mini" class="custom-button" @click="jobAdd(index)">分  配</van-button>
-                    <van-button v-if="assignType === '已分配'" type="primary"  size="mini" class="custom-button" @click="jobEdit(index)">修  改</van-button>
+                    <van-button v-if="assignType === '新装'" type="primary"  size="mini" class="custom-button" @click="jobAdd(index)">分  配</van-button>
+                    <van-button v-if="assignType === '维修更换'" type="primary"  size="mini" class="custom-button" @click="jobAdd(index)">维修更换</van-button>
+                    <van-button v-if="assignType === '拆机'" type="primary"  size="mini" class="custom-button" @click="jobAdd(index)">拆机</van-button>
+                    <van-button v-if="assignType === '已分配'" type="primary"  size="mini" class="custom-button" @click="jobEdit(index)">修改</van-button>
                   </template>
             </van-cell>
             <van-cell-group inset>
@@ -161,6 +170,7 @@
     const date = ref('');
     const billcode = ref('');
     const ctradername = ref('');
+    const userdef1 = ref('');
     const jobDate= ref('');
     const pickerValue = ref<string[]>([]);
     const pickerTimeValue = ref<string[]>([]);
@@ -180,6 +190,13 @@
     const columns = ref([]);
     //装维单数据
     const assignJobData = ref<SaleBill[]>([]);
+    // 任务类型下拉选项
+    const assignTypeOptions = ref([
+      { text: '新装', value: '新装' },
+      { text: '维修更换', value: '维修更换' },
+      { text: '拆机', value: '拆机' },
+      { text: '已分配', value: '已分配' }
+    ]);
 
     onMounted(() => {
       assignType.value = '新装';
@@ -187,6 +204,11 @@
       getSaleList();
     });
     
+    // 任务类型下拉选项选择事件
+    const cleardata = () => {
+      assignJobData.value = [];
+    }
+
     // 点击选择装维人员
     const onConfirm = ({ selectedValues, selectedOptions }: { selectedValues: string[], selectedOptions: Option[] }) => {
       console.log(selectedValues, selectedOptions[0].text);
@@ -259,6 +281,7 @@
             resultDate: resultDate,
             assignType: assignType.value,
             ctradername: ctradername.value,
+            userdef1: userdef1.value,
             billcode: billcode.value
           }
         })

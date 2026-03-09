@@ -10,6 +10,8 @@ export interface setuprecord {
     realnametype: string;
     routertype: string;
     routername: string;
+    routersn: string;
+    devicesn: string;
     aftersetup: string;
     setupdate: string;
     recorddate: string;
@@ -36,6 +38,7 @@ export interface SaleBill {
   jobdate: string;
   jobtime: string;
   assigntype: string;
+  applyId: number;
   jobid: number;
   userdef1: string;
   userdef2: string;

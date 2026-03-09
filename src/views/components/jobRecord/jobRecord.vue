@@ -25,7 +25,7 @@
                     collapse-text="收起"
                     />
                     <div>销售员:<van-text-ellipsis :content="saleBillData.empname" /></div>
-                    <div>超密:<van-text-ellipsis 
+                    <div><van-text-ellipsis 
                         :content="'品牌名称:' +(saleBillData.userdef1===null?'':saleBillData.userdef1) + 
                             '安装时间:' +(saleBillData.userdef2===null?'':saleBillData.userdef2) + 
                             '沉默期:' +(saleBillData.userdef3===null?'':saleBillData.userdef3) +
@@ -46,7 +46,6 @@
             </van-collapse-item>
         </van-collapse> 
         <van-form @submit="onRecordSubmit">
-            <van-field v-if="saleBillData.assigntype === '新装'" v-model="addr" label="地址:" />
             <van-field v-model="topology" label="网络拓扑:" />
             <van-field v-if="saleBillData.assigntype === '新装'"
                 v-model="carrier"
@@ -76,6 +75,24 @@
                 @click="showPickerRouterType = true"
             />
             <van-field v-if="routertype==='另安装'" v-model="routername" label="路由器型号:" />
+                
+            <!-- <van-row>
+                <van-col span="20">
+                <div >
+                    <van-field
+                    v-model="deviceSN"
+                    label="设备SN号"
+                    placeholder="请输入sn号码"
+                    required
+                    />
+                </div>
+                </van-col>
+                <van-col span="4">
+                <van-button icon="scan"  plain square type="primary"  size="small" @click="scanSN" />
+                </van-col>
+            </van-row> -->
+            <!-- <van-field v-if="saleBillData.assigntype === '维修更换'" v-model="deviceSN" label="设备SN号:" /> -->
+            <van-field v-if="saleBillData.assigntype === '维修更换'" v-model="routerSN" label="路由器SN号:" />
             <van-cell v-if="saleBillData.assigntype === '新装'" title="安装后应用:" />
             <van-checkbox-group v-if="saleBillData.assigntype === '新装'" v-model="aftersetup" direction="horizontal">
                 <van-checkbox name="收银机">收银机</van-checkbox>
@@ -83,6 +100,36 @@
                 <van-checkbox name="摄像头">摄像头</van-checkbox>
             </van-checkbox-group>
             <van-cell title="安装日期:" :value="setupdate" @click="setupTimeShow = true"  />
+            <van-cell>
+                <template #title>
+                    <van-field
+                            name="SNuploader"
+                            v-model="deviceSN"
+                            label="设备SN号"
+                            placeholder="请输入sn号码"
+                    >
+                    </van-field>
+                </template>
+                <template #right-icon>
+                    <van-button type="primary"  size="mini" class="custom-button" @click="scanSN">条码</van-button>
+                  </template>
+            </van-cell>
+
+            <van-field
+                    name="SNuploader"
+                    v-model="deviceSN"
+                    label="文字识别SN号码"
+                    placeholder="请输入sn号码"
+            >
+                <template #input>
+                        <van-uploader v-model="SNPicUrl"
+                        :multiple="true"
+                        :max-count="10"
+                        @after-read="handleSNUpload"
+                        >
+                        </van-uploader>
+                </template>
+            </van-field>
             <van-field name="uploader" label="安装验收:">
                 <template #input>
                     <van-uploader v-model="picUrl"
@@ -153,9 +200,9 @@ import Compressor from 'compressorjs';
 const route = useRoute();
 const collapse = ref('1');
 // 定义需要创建 ref 的变量名数组
-const fieldNames = ['billcode','tel', 'addr', 'contact', 'carrier', 'realnametype', 'cusName', 'routertype', 'routername', 'setupdate', 'topology','remark'];
+const fieldNames = ['routerSN','deviceSN','billcode','tel', 'addr', 'contact', 'carrier', 'realnametype', 'cusName', 'routertype', 'routername', 'setupdate', 'topology','remark'];
 // 使用 Object.fromEntries 批量创建 ref 变量
-const { billcode, tel, addr, contact, carrier, realnametype, cusname, routertype, routername, setupdate, topology,remark } = Object.fromEntries(fieldNames.map(name => [name, ref('')]));
+const { routerSN,deviceSN,billcode, tel, addr, contact, carrier, realnametype, cusname, routertype, routername, setupdate, topology,remark } = Object.fromEntries(fieldNames.map(name => [name, ref('')]));
 const loading = ref(false);
 const jobid = ref(0);
 const operatorPickerValue = ref<string[]>([]);
@@ -170,13 +217,17 @@ const showPickerAfterSetupType = ref(false);
 const setupTimeShow = ref(false);
 const minDate = new Date(2010, 0, 1);
 const maxDate = new Date(2099, 11, 31);
+
+const tag = ref('');
+const qr = ref('');
 //读取路由带进来的参数
 billcode.value = route.query.billcode as string;
 jobid.value = route.query.jobid as unknown as number;
-
+qr.value = route.query.qrresult as string;
 //初始化页面后调用函数
 const picUrl = ref([]);
 const wxPicUrl = ref([]);
+const SNPicUrl = ref([]);
 
 const saleBillData = ref<SaleBill>({
     billcode: '',
@@ -196,6 +247,7 @@ const saleBillData = ref<SaleBill>({
     userdef2: '',
     userdef3: '',
     userdef4: '',
+    applyId: 0,
     userdef5: '',
     userdef6: '',
     userdef7: '',
@@ -211,11 +263,27 @@ const saleBillData = ref<SaleBill>({
     onMounted(() => {
         console.log('onMounted执行getJobInfo');
         getUserinfoFromSession();
-        
         getJobInfo(billcode.value);
+
+  // 从 sessionStorage 中读取 userInfoDetail 和 userInfo
+        deviceSN.value = sessionStorage.getItem("SN") || '';
+        tag.value = sessionStorage.getItem("tag") || '';
+        console.log("tag", tag.value);
+        if(qr.value) {
+            deviceSN.value = qr.value;
+            alert(deviceSN.value);
+            // 跳转到设备信息页面
+        } else {
+            // showToast('"请扫描sn码');
+        }
+
+
     });
-
-
+    const scanSN = () => {
+        sessionStorage.setItem("tag", "SN");
+        alert(encodeURIComponent(location.href));
+        window.open('//996315.com/api/scan/?redirect_uri=' + encodeURIComponent(location.href), '_self')
+    }
 
     const onConfirmOperator = ({ selectedValues, selectedOptions }: { selectedValues: string[], selectedOptions: Option[] }) => {
         console.log(selectedValues, selectedOptions[0].text);
@@ -262,6 +330,7 @@ const saleBillData = ref<SaleBill>({
             depname: '',
             empname: '',
             operator : '',
+            applyId: 0,
             jobdate: '',
             assigntype: '',
             jobid: 0,
@@ -298,11 +367,21 @@ const saleBillData = ref<SaleBill>({
         loading.value = true;
         let picpath = '';
         let wxpicpath= '';
+        let snpicpath= '';
+
+        const snformData = new FormData();
+        SNPicUrl.value.forEach((file: { file: File }) => {
+            snformData.append('file', file.file);
+            
+        });
+
+
         const formData = new FormData();
         picUrl.value.forEach((file: { file: File }) => {
             formData.append('file', file.file);
             
         });
+
         console.log(formData);
         const formDataWx = new FormData();
         wxPicUrl.value.forEach((file: { file: File }) => {
@@ -312,6 +391,23 @@ const saleBillData = ref<SaleBill>({
 
 
         let nonce = generateNonce();
+
+        axios.post(`${DOMAIN_RUL}/workWeChart/recordSNUpload`, snformData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+        .then(response => {
+            if (response.data.code === 200) {
+                console.log('请求成功', response.data);
+                // snpicpath = response.data.result;
+                // 上传sn图片后返回读取的sn 字符串。
+            }
+        })
+        .catch(error => {
+            console.error('请求失败', error);
+        });
+        
         axios.post(`${DOMAIN_RUL}/workWeChart/recordWxUpload`, formDataWx, {
             headers: {
                 'Content-Type': 'multipart/form-data'
@@ -342,7 +438,7 @@ const saleBillData = ref<SaleBill>({
                         loading.value = false;
                         return;
                     }
-                    recordAdd(JSON.stringify(picpath),JSON.stringify(wxpicpath),nonce);
+                    recordAdd(JSON.stringify(picpath),JSON.stringify(wxpicpath),JSON.stringify(snpicpath),nonce);
                 }
                 loading.value = false;
             })
@@ -353,16 +449,18 @@ const saleBillData = ref<SaleBill>({
                     loading.value = false;
                     return;
                 }
-            recordAdd(JSON.stringify(picpath),JSON.stringify(wxpicpath),nonce);
+            recordAdd(JSON.stringify(picpath),JSON.stringify(wxpicpath),JSON.stringify(snpicpath), nonce);
             loading.value = false;
             });
         
     };
 
-    const recordAdd = (picpath:string,wxPicPath:String,nonce:string) => {
+    const recordAdd = (picpath:string,wxPicPath:String,snpicpath:string, nonce:string) => {
         loading.value = true;
         console.log('picpath',picpath);
         let recordInfo = { 
+            routersn: routerSN.value,
+            devicesn: deviceSN.value,
             billcode: billcode.value, 
             tel: tel.value, 
             addr: addr.value, 
@@ -378,6 +476,7 @@ const saleBillData = ref<SaleBill>({
             carrier: carrier.value,  // Add default value for carrier
             picurl: picpath, 
             wxpicurl: wxPicPath,
+            snpicurl: snpicpath,
             jobid: jobid.value,
             assigntype: saleBillData.value.assigntype,
             verifytype: '完成',
@@ -411,6 +510,14 @@ const saleBillData = ref<SaleBill>({
             // 在这里处理错误
             });
     };
+
+
+    // 处理SN图片上传
+const handleSNUpload = (file: any) => {
+    console.log('SN图片上传:', file);
+    // 这里可以添加文件上传后的处理逻辑
+    // 例如：压缩图片、上传到服务器等
+};
 
 
     //数据完整性校验

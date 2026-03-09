@@ -1,6 +1,6 @@
 <template>
   <div>
-    <van-field v-model="iccid" label="ICCID 号" placeholder="请输入 ICCID 号" />
+    <van-field v-model="iccid" label="ICCID 号" placeholder="请输入 ICCID 号,用户号,接入号" />
     <van-button @click="fetchCardInfo()">查询</van-button>
     <div v-if="cardStatuInfo">
       <p>ICCID 号: {{ cardInfoMeta.iccidCode }}</p>
